@@ -6,8 +6,8 @@ import { DragDropContext } from 'react-beautiful-dnd'
 export default function App(props) {
   
     const [initialData, setInitialData] = useState({});
-    const [id, setId] = useState(0);
     const [loaded, setLoaded] = useState(false);
+    const [rerender, setRerender] = useState(false);
 
     useEffect(() => {
       fetch("http://localhost:5000/boards/get-data")
@@ -15,8 +15,9 @@ export default function App(props) {
       .then(response => { 
         setInitialData(response);
         setLoaded(true);
+        setRerender(false);
       });
-    }, []);
+    }, [rerender]);
 
     const Container = elems => (
         <div className="h-screen bg-blue-500 w-full">
@@ -59,7 +60,7 @@ export default function App(props) {
         const newState = {
           ...initialData,
           columns: [
-            ...initialData.columns.map(column => column.id != newColumn.id ? column : newColumn),
+            ...initialData.columns.map(column => column.id !== newColumn.id ? column : newColumn),
           ],
         };
       
@@ -94,8 +95,12 @@ export default function App(props) {
     setInitialData(newState);
   };
 
-    const handleBoardAdd = (id) => {
-      setId(() => id + 1);
+    const handleBoardAdd = (newBoard) => {
+      let boardsData = initialData;
+      boardsData.columns.push(newBoard);
+
+      setInitialData(() => boardsData);
+      setRerender(true);
     }
 
     const addNewTaskToBoard = data => {
@@ -107,11 +112,52 @@ export default function App(props) {
       setInitialData(() => boardsData);
     }
 
+    const handleBoardDelete = (boardId) => {
+      fetch("http://localhost:5000/boards/delete-board", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: boardId})
+      })
+      .then(res => res.json())
+      .then(response => { 
+        console.log(response);
+        setRerender(true);
+      });
+    }
+
+    const handleTaskDelete = (taskId, boardId) => {
+      fetch("http://localhost:5000/boards/delete-item", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: taskId})
+      })
+      .then(res => res.json())
+      .then(response => { 
+        let boardsData = initialData;
+
+        boardsData.tasks = boardsData.tasks.filter(task => task.id !== taskId);
+
+        const taskIds = boardsData.columns.find(column => column.id === boardId).taskIds.filter(taskID => taskID !== taskId);
+        boardsData.columns.find(column => column.id === boardId).taskIds = taskIds;
+        
+        setRerender(true);
+        
+        setInitialData(() => boardsData);
+      });
+
+
+      
+    }
+
     const displayBoards = () => {
       return initialData.columns.map(column => {
-        const tasks = column.taskIds.map(taskId => initialData.tasks[taskId]);
+        const tasks = column.taskIds.map(taskId => initialData.tasks.find(task => task.id === taskId));
 
-        return <TasksBoard key={column.id} column={column} tasks={tasks} addNewTask={ addNewTaskToBoard } />
+        return <TasksBoard key={column.id} column={column} tasks={tasks} deleteTask={ handleTaskDelete } deleteBoard= { handleBoardDelete } addNewTask={ addNewTaskToBoard } />
       });
     }
 

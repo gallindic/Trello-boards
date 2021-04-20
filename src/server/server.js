@@ -15,7 +15,6 @@ const userRoute = require('./routes/user');
 app.use('/boards', boardsRoute);
 app.use('/user', userRoute);
 
-//const uri = "mongodb+srv://eminem1999:eminem1999@learning-cluster.ukzy6.mongodb.net/trello?retryWrites=true&w=majority";
 const uri = "mongodb+srv://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@" + process.env.DB_HOST + "/" + process.env.DB_DATABASE + "?retryWrites=true&w=majority";
 mongoose.connect(uri, { useUnifiedTopology: true, useNewUrlParser: true  }, () => {
 	console.log("Connected to DB");

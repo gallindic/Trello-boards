@@ -27,9 +27,17 @@ export default function TasksBoard (props) {
     <p className="mt-3 text-gray-dark text-xs cursor-pointer" onClick={ () => setShowInput(true) }>Add a card...</p>
   );
 
+  const handleTaskDelete = (taskId) => {
+    let newTasks = tasks;
+    newTasks.filter(task => task.id !== taskId);
+
+    setTasks(newTasks);
+    props.deleteTask(taskId, props.column.id);
+  }
+
   const displayTasks = () => {
     return tasks.map((task, index) => {
-      return <Task key={task.id} task={task} index={index} />
+      return <Task key={task.id} task={task} index={index} deleteTask={ handleTaskDelete } />
     });
   }
 
@@ -56,9 +64,13 @@ export default function TasksBoard (props) {
     .catch(err => console.log(err));
   }
 
+  const handeBoardDelete = () => {
+    props.deleteBoard(props.column.id);
+  }
+
   return (
     <CardContainer>
-      <Title title={props.column.name}/>
+      <Title title={props.column.name} deleteEventHandler= { handeBoardDelete }/>
       <TasksContainer />
       <InputContainer showInput={showInput} placeholder={"Board item"} handleSubmit={(name) => { insertItemToDB(name); }} />
       <AddNewBtn/>

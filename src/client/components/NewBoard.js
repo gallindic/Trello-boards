@@ -14,7 +14,8 @@ export default function NewBoard(props) {
         .then(data => {
             let newBoard = {
                 id: data.id,
-                content: data.name
+                name: data.name,
+                taskIds: []
             };
 
             props.onBoardAdd(newBoard);
@@ -24,7 +25,7 @@ export default function NewBoard(props) {
 
     return(
         <CardContainer>
-            <Title title="Add board"/>
+            <Title title="Add board" visible={false}/>
             <InputContainer showInput={true} placeholder={"Board name"} handleSubmit={(name) => InsertBoardToDB(name) } />
         </CardContainer>
     );

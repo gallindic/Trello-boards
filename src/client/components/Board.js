@@ -1,3 +1,4 @@
+import { PromiseProvider } from 'mongoose';
 import Input from './Input';
 
 const CardContainer = elems => (
@@ -6,10 +7,11 @@ const CardContainer = elems => (
     </div>
 );
 
-const Title = ({title}) => (
-    <div className="flex justify-between py-1">
+const Title = ({title, deleteEventHandler, visible=true}) => (
+    <div className="flex items-center justify-between py-1">
         <h3 className="text-sm">{title}</h3>
-        <svg className="h-4 fill-current text-grey-dark cursor-pointer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 10a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4zm7 0a1.999 1.999 0 1 0 0 4 1.999 1.999 0 1 0 0-4z"/></svg>
+        { visible ? <div className="text-xs font-bold cursor-pointer" onClick={ deleteEventHandler }>x</div> : <div></div> }
+        
     </div>
 );
 

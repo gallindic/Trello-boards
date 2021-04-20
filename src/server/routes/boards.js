@@ -63,6 +63,18 @@ router.post('/add', async (req, res) => {
 	}
 });
 
+//Delete board
+router.post('/delete-board', async (req, res) => {
+	try {
+		const deletedItems = await BoardItem.deleteMany( { boardID: req.body.id });
+		const deletedBoard = await Board.deleteOne( { id: req.body.id });
+
+		res.json({items: deletedItems, board: deletedBoard});
+	} catch (err) {
+		res.json({message: err});
+	}
+});
+
 //Insert board item
 router.post('/add-item', async (req, res) => {
 	const itemsCount = await BoardItem.countDocuments({});
@@ -78,6 +90,16 @@ router.post('/add-item', async (req, res) => {
         res.json(savedBoardItem);
 	} catch (err) {
 		res.json({ message: err });
+	}
+});
+
+//Delete board item
+router.post('/delete-item', async (req, res) => {
+	try {
+		const deleted = await BoardItem.deleteOne( { id: req.body.id });
+		res.json({deleted});
+	} catch (err) {
+		res.json({message: err});
 	}
 });
 
